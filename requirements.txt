@@ -9,8 +9,8 @@ Pillow==11.3.0
 pillow-avif-plugin    # only needed if converting .avif images
 
 # Visualisation (used in phase3_evaluation.py)
-matplotlib==3.8.2
-seaborn==0.13.0
+matplotlib>=3.9.0        # 3.9+ required for numpy 2.x compatibility
+seaborn>=0.13.2          # 0.13.2+ works with matplotlib 3.9
 
 # Web app
 streamlit>=1.30.0
