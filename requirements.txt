@@ -1,0 +1,19 @@
+# Core ML / training
+tensorflow==2.21.0
+numpy==2.4.3          # 2.x required — do NOT downgrade (breaks opencv/cv2 ABI)
+pandas>=2.2.0         # 2.2+ required for numpy 2.x compatibility
+scikit-learn>=1.4.0   # 1.4+ required for numpy 2.x compatibility
+
+# Image handling
+Pillow==11.3.0
+pillow-avif-plugin    # only needed if converting .avif images
+
+# Visualisation (used in phase3_evaluation.py)
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Web app
+streamlit>=1.30.0
+
+# Note: opencv-python is NOT required by the app.
+# The camera tab in app.py uses st.camera_input (browser-based — no OpenCV needed).
