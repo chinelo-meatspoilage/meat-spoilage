@@ -90,6 +90,7 @@ streamlit run app.py
 ```
 app.py                                  ← the Streamlit app (main entry point)
 requirements.txt                        ← tells Streamlit Cloud what to install
+runtime.txt                             ← pins Python to 3.12 (required — TF has no Python 3.14 wheels)
 phase3_inference.py                     ← inference logic used by app.py
 phase2_training.py                      ← IMAGE_SIZE, LABEL_COLUMNS, preprocess_image
 dataset_loader.py                       ← label map used by training scripts
