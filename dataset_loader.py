@@ -4,7 +4,11 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 from PIL import Image
-from torch.utils.data import Dataset
+
+try:
+    from torch.utils.data import Dataset
+except ImportError:
+    Dataset = object  # fallback when torch is not installed
 
 
 LABEL_COLUMNS = ["Fresh", "Spoiled"]
