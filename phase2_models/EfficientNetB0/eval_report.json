@@ -1,40 +1,40 @@
 {
   "classification_report":{
     "Fresh":{
-      "precision":0.9542857143,
-      "recall":0.9382022472,
-      "f1-score":0.9461756374,
+      "precision":0.9707602339,
+      "recall":0.9325842697,
+      "f1-score":0.9512893983,
       "support":178.0
     },
     "Spoiled":{
-      "precision":0.9601449275,
-      "recall":0.9706959707,
-      "f1-score":0.9653916211,
+      "precision":0.9571428571,
+      "recall":0.9816849817,
+      "f1-score":0.9692585895,
       "support":273.0
     },
-    "accuracy":0.9578713969,
+    "accuracy":0.9623059867,
     "macro avg":{
-      "precision":0.9572153209,
-      "recall":0.9544491089,
-      "f1-score":0.9557836293,
+      "precision":0.9639515455,
+      "recall":0.9571346257,
+      "f1-score":0.9602739939,
       "support":451.0
     },
     "weighted avg":{
-      "precision":0.9578324221,
-      "recall":0.9578713969,
-      "f1-score":0.9578074856,
+      "precision":0.9625173429,
+      "recall":0.9623059867,
+      "f1-score":0.9621665362,
       "support":451.0
     }
   },
   "confusion_matrix":[
     [
-      167,
-      11
+      166,
+      12
     ],
     [
-      8,
-      265
+      5,
+      268
     ]
   ],
-  "roc_auc":0.9899576079
+  "roc_auc":0.992591678
 }

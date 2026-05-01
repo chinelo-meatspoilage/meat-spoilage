@@ -1,28 +1,28 @@
 {
   "classification_report":{
     "Fresh":{
-      "precision":0.808988764,
+      "precision":0.8372093023,
       "recall":0.808988764,
-      "f1-score":0.808988764,
+      "f1-score":0.8228571429,
       "support":178.0
     },
     "Spoiled":{
-      "precision":0.8754578755,
-      "recall":0.8754578755,
-      "f1-score":0.8754578755,
+      "precision":0.8781362007,
+      "recall":0.8974358974,
+      "f1-score":0.8876811594,
       "support":273.0
     },
-    "accuracy":0.8492239468,
+    "accuracy":0.8625277162,
     "macro avg":{
-      "precision":0.8422233198,
-      "recall":0.8422233198,
-      "f1-score":0.8422233198,
+      "precision":0.8576727515,
+      "recall":0.8532123307,
+      "f1-score":0.8552691511,
       "support":451.0
     },
     "weighted avg":{
-      "precision":0.8492239468,
-      "recall":0.8492239468,
-      "f1-score":0.8492239468,
+      "precision":0.8619832342,
+      "recall":0.8625277162,
+      "f1-score":0.8620965143,
       "support":451.0
     }
   },
@@ -32,9 +32,9 @@
       34
     ],
     [
-      34,
-      239
+      28,
+      245
     ]
   ],
-  "roc_auc":0.9264518253
+  "roc_auc":0.9454870972
 }

@@ -1,16 +1,16 @@
 # How This Project Works
 
-> **Current implementation:** Binary classification — **Fresh** vs **Spoiled**.  
-> Half-Fresh was merged into the Spoiled class (both are unsafe to eat).  
+> **Current implementation:** Binary classification — **Fresh** vs **Spoiled**.
+> Half-Fresh was merged into the Spoiled class (both are unsafe to eat).
 > Selected model: **ResNet50** (val accuracy 98.9%, macro F1 0.988).
 
 ---
 
 ### **PHASE 1: Data Strategy & The "Color Trap" (Crucial)**
-The training set contains 1912 images and the validation set 451 images across 2 classes (`Fresh`, `Spoiled`).
+The training set contains **1,916 images** (762 Fresh / 1,154 Spoiled) and the validation set 451 images across 2 classes (`Fresh`, `Spoiled`).
 Here is how we handle it:
 
-1.  **Check for Class Imbalance:** The training set has ~761 Fresh and ~1151 Spoiled images. We handle the imbalance using **Class Weights** (inverse-frequency) so the model pays proportional attention to both classes.
+1.  **Check for Class Imbalance:** The training set has ~762 Fresh and ~1,154 Spoiled images. We handle the imbalance using **Class Weights** (inverse-frequency) so the model pays proportional attention to both classes.
 2.  **Image Sizing:** The images are 416x416. While great for detail, standard CNNs (ResNet, MobileNet) are optimized for **224x224**. We will resize the images to 224x224. This speeds up training massively without losing the semantic information needed to detect spoilage.
 3.  **Data Augmentation (The Trap to Avoid):** 
     *   *What we WILL do:* Random rotations (0-90 degrees), horizontal/vertical flips, and slight zooming. (Code will be shared with Chinelo).

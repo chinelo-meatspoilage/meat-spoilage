@@ -1,1 +1,8 @@
 *.zip
+__pycache__/
+*.pyc
+*.bak
+.claude/
+push.txt
+Q-A.md
+logs-*.txt

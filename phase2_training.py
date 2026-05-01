@@ -266,8 +266,8 @@ def train_and_evaluate():
     train_ds = make_dataset(train_pairs, batch=BATCH_SIZE, training=True)
     valid_ds = make_dataset(valid_pairs, batch=BATCH_SIZE, training=False)
 
-    # model_names = ["MobileNetV2", "ResNet50", "EfficientNetB0"]
-    model_names = [ "ResNet50"]
+    model_names = ["MobileNetV2", "ResNet50", "EfficientNetB0"]
+    # model_names = [ "ResNet50"]
     summary_rows = []
 
     for model_name in model_names:

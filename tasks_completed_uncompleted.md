@@ -1,6 +1,6 @@
 # Tasks Completed / Tasks Remaining
 
-This document gives a **clear, high-level view** of what has been implemented.  
+This document gives a **clear, high-level view** of what has been implemented.
 **Current state:** Binary classification (Fresh vs Spoiled). ResNet50 selected. Desktop app included.
 
 ---
@@ -13,7 +13,7 @@ This document gives a **clear, high-level view** of what has been implemented.
 - ✅ **One-hot validity checks** (exactly one class is hot per sample).
 - ✅ **File path resolution + missing file detection**.
 - ✅ **Duplicate filename detection**.
-- ✅ **Class distribution and imbalance ratios** (train: ~761 Fresh / 1151 Spoiled).
+- ✅ **Class distribution and imbalance ratios** (train: ~762 Fresh / 1,154 Spoiled — includes 4 newly added images).
 - ✅ **Class weights computed** (inverse-frequency weighting).
 - ✅ **Augmentation pipeline** — safe rotations/flips/zoom/brightness/contrast only (no hue/saturation shifts).
 - ✅ **Quick sample sanity check** — a few images loaded and tensor shapes verified.

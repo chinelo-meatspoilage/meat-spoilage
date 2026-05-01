@@ -7,8 +7,8 @@
 ## Metrics from validation run
 | Class | Precision | Recall | F1 | Support |
 |---|---|---|---|---|
-| Fresh | 0.994 | 0.983 | 0.989 | 178 |
-| Spoiled | 0.989 | 0.996 | 0.993 | 273 |
+| Fresh | 0.983 | 1.000 | 0.992 | 178 |
+| Spoiled | 1.000 | 0.989 | 0.994 | 273 |
 
-**Macro avg F1**:  0.991  
-**Accuracy**: 0.991
+**Macro avg F1**:  0.993  
+**Accuracy**: 0.993
