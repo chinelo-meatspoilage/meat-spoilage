@@ -2,7 +2,7 @@
 
 > **Current implementation:** Binary classification — **Fresh** vs **Spoiled**.
 > Half-Fresh was merged into the Spoiled class (both are unsafe to eat).
-> Selected model: **ResNet50** (val accuracy 98.9%, macro F1 0.988).
+> Selected model: **ResNet50** (val accuracy 99.33%, macro F1 0.993, ROC-AUC 0.9998).
 
 ---
 
