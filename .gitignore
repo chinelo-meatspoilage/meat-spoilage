@@ -9,5 +9,6 @@ logs-*.txt
 
 # Local artefacts — not needed by the deployed app
 image.png
+image copy.png
 PROJECT_DOCUMENTATION.pdf
 ResNet50_Training_History_Report.txt

@@ -85,41 +85,49 @@
 
 <script>
   // ── Streamlit component messaging protocol ────────────────────────────────
-  function sendToStreamlit(type, value) {
-    window.parent.postMessage({ type, value }, "*");
-  }
+  // All messages to the parent frame MUST include isStreamlitMessage: true
+  // or Streamlit will silently ignore them.
 
-  function setComponentReady() {
-    sendToStreamlit("streamlit:componentReady", { apiVersion: 1 });
-  }
-
-  function setComponentValue(value) {
+  function postToStreamlit(payload) {
     window.parent.postMessage(
-      { type: "streamlit:setComponentValue", value, dataType: "json" },
+      Object.assign({ isStreamlitMessage: true }, payload),
       "*"
     );
   }
 
+  function setComponentReady() {
+    // apiVersion must be a top-level key, NOT nested inside "value"
+    postToStreamlit({ type: "streamlit:componentReady", apiVersion: 1 });
+  }
+
+  function setComponentValue(value) {
+    postToStreamlit({
+      type: "streamlit:setComponentValue",
+      value: value,
+      dataType: "json",
+    });
+  }
+
   function setFrameHeight() {
     const h = document.getElementById("container").scrollHeight + 20;
-    window.parent.postMessage({ type: "streamlit:setFrameHeight", height: h }, "*");
+    postToStreamlit({ type: "streamlit:setFrameHeight", height: h });
   }
 
   // ── State ─────────────────────────────────────────────────────────────────
   let stream      = null;
-  let facingMode  = "environment"; // default = back camera
+  let facingMode  = "environment"; // default = back camera on mobile
   let capturedURL = null;
 
-  const video          = document.getElementById("video");
-  const preview        = document.getElementById("preview");
-  const canvas         = document.getElementById("canvas");
-  const flipBtn        = document.getElementById("flipBtn");
-  const captureBtn     = document.getElementById("captureBtn");
-  const retakeBtn      = document.getElementById("retakeBtn");
-  const useBtn         = document.getElementById("useBtn");
-  const liveControls   = document.getElementById("liveControls");
-  const previewControls= document.getElementById("previewControls");
-  const errorMsg       = document.getElementById("errorMsg");
+  const video           = document.getElementById("video");
+  const preview         = document.getElementById("preview");
+  const canvas          = document.getElementById("canvas");
+  const flipBtn         = document.getElementById("flipBtn");
+  const captureBtn      = document.getElementById("captureBtn");
+  const retakeBtn       = document.getElementById("retakeBtn");
+  const useBtn          = document.getElementById("useBtn");
+  const liveControls    = document.getElementById("liveControls");
+  const previewControls = document.getElementById("previewControls");
+  const errorMsg        = document.getElementById("errorMsg");
 
   // ── Camera helpers ────────────────────────────────────────────────────────
   async function startCamera(facing) {
@@ -132,9 +140,9 @@
         video: {
           facingMode: { ideal: facing },
           width:  { ideal: 1280 },
-          height: { ideal: 720 }
+          height: { ideal: 720 },
         },
-        audio: false
+        audio: false,
       });
       video.srcObject = stream;
       errorMsg.textContent = "";
@@ -144,25 +152,26 @@
   }
 
   function showLiveView() {
-    preview.style.display        = "none";
-    video.style.display          = "";
-    liveControls.style.display   = "flex";
-    previewControls.style.display= "none";
-    retakeBtn.style.display      = "none";
-    useBtn.style.display         = "none";
+    preview.style.display         = "none";
+    video.style.display           = "";
+    liveControls.style.display    = "flex";
+    previewControls.style.display = "none";
+    retakeBtn.style.display       = "none";
+    useBtn.style.display          = "none";
     capturedURL = null;
+    setComponentValue(null);
     setFrameHeight();
   }
 
   function showPreviewView(dataURL) {
-    capturedURL = dataURL;
-    preview.src                  = dataURL;
-    preview.style.display        = "";
-    video.style.display          = "none";
-    liveControls.style.display   = "none";
-    previewControls.style.display= "flex";
-    retakeBtn.style.display      = "inline-block";
-    useBtn.style.display         = "inline-block";
+    capturedURL                   = dataURL;
+    preview.src                   = dataURL;
+    preview.style.display         = "";
+    video.style.display           = "none";
+    liveControls.style.display    = "none";
+    previewControls.style.display = "flex";
+    retakeBtn.style.display       = "inline-block";
+    useBtn.style.display          = "inline-block";
     setFrameHeight();
   }
 
@@ -177,14 +186,10 @@
     canvas.width  = video.videoWidth  || 640;
     canvas.height = video.videoHeight || 480;
     canvas.getContext("2d").drawImage(video, 0, 0);
-    const dataURL = canvas.toDataURL("image/jpeg", 0.92);
-    showPreviewView(dataURL);
+    showPreviewView(canvas.toDataURL("image/jpeg", 0.92));
   });
 
-  retakeBtn.addEventListener("click", () => {
-    setComponentValue(null);
-    showLiveView();
-  });
+  retakeBtn.addEventListener("click", showLiveView);
 
   useBtn.addEventListener("click", () => {
     if (capturedURL) {
@@ -195,6 +200,7 @@
   // ── Boot ──────────────────────────────────────────────────────────────────
   video.addEventListener("loadedmetadata", setFrameHeight);
 
+  // Signal ready to Streamlit FIRST, then start camera
   setComponentReady();
   startCamera(facingMode);
 </script>
