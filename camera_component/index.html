@@ -17,6 +17,8 @@
       align-items: center;
       gap: 10px;
       padding: 8px 4px;
+      /* Never let the container collapse before the video stream loads */
+      min-height: 480px;
     }
 
     #video, #preview {
@@ -24,6 +26,8 @@
       max-width: 520px;
       border-radius: 8px;
       background: #000;
+      /* Reserve space so the container isn't zero-height on load */
+      min-height: 360px;
     }
 
     #preview { display: none; }
@@ -85,9 +89,6 @@
 
 <script>
   // ── Streamlit component messaging protocol ────────────────────────────────
-  // All messages to the parent frame MUST include isStreamlitMessage: true
-  // or Streamlit will silently ignore them.
-
   function postToStreamlit(payload) {
     window.parent.postMessage(
       Object.assign({ isStreamlitMessage: true }, payload),
@@ -96,7 +97,6 @@
   }
 
   function setComponentReady() {
-    // apiVersion must be a top-level key, NOT nested inside "value"
     postToStreamlit({ type: "streamlit:componentReady", apiVersion: 1 });
   }
 
@@ -108,8 +108,9 @@
     });
   }
 
-  function setFrameHeight() {
-    const h = document.getElementById("container").scrollHeight + 20;
+  // Always send a hard height — never let Streamlit auto-shrink the iframe
+  function setFrameHeight(px) {
+    const h = px !== undefined ? px : document.getElementById("container").scrollHeight + 20;
     postToStreamlit({ type: "streamlit:setFrameHeight", height: h });
   }
 
@@ -192,16 +193,18 @@
   retakeBtn.addEventListener("click", showLiveView);
 
   useBtn.addEventListener("click", () => {
-    if (capturedURL) {
-      setComponentValue(capturedURL);
-    }
+    if (capturedURL) setComponentValue(capturedURL);
   });
 
-  // ── Boot ──────────────────────────────────────────────────────────────────
-  video.addEventListener("loadedmetadata", setFrameHeight);
+  // Refine height once the video stream dimensions are known
+  video.addEventListener("loadedmetadata", () => setFrameHeight());
 
-  // Signal ready to Streamlit FIRST, then start camera
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  // 1. Tell Streamlit the component is ready
   setComponentReady();
+  // 2. Immediately claim a full-size frame (540px) so the iframe never collapses
+  setFrameHeight(540);
+  // 3. Start the camera (async — won't block the height above)
   startCamera(facingMode);
 </script>
 </body>
