@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Source Sans Pro", sans-serif;
+      background: transparent;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px;
+    }
+
+    #video, #preview {
+      width: 100%;
+      max-width: 520px;
+      border-radius: 8px;
+      background: #000;
+    }
+
+    #preview { display: none; }
+
+    canvas { display: none; }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    #flipBtn    { background: #f0f2f6; color: #31333f; }
+    #captureBtn { background: #ff4b4b; color: #fff; }
+    #retakeBtn  { background: #f0f2f6; color: #31333f; display: none; }
+    #useBtn     { background: #21c354; color: #fff;    display: none; }
+
+    #previewControls { display: none; }
+
+    #errorMsg {
+      color: #ff4b4b;
+      font-size: 13px;
+      text-align: center;
+      padding: 4px 8px;
+    }
+  </style>
+</head>
+<body>
+<div id="container">
+  <video id="video" autoplay playsinline muted></video>
+  <img   id="preview" alt="Captured photo" />
+  <canvas id="canvas"></canvas>
+
+  <div class="btn-row" id="liveControls">
+    <button id="flipBtn">&#x1F504; Flip Camera</button>
+    <button id="captureBtn">&#x1F4F7; Capture</button>
+  </div>
+
+  <div class="btn-row" id="previewControls">
+    <button id="retakeBtn">&#x21A9; Retake</button>
+    <button id="useBtn">&#x2713; Use Photo</button>
+  </div>
+
+  <div id="errorMsg"></div>
+</div>
+
+<script>
+  // ── Streamlit component messaging protocol ────────────────────────────────
+  function sendToStreamlit(type, value) {
+    window.parent.postMessage({ type, value }, "*");
+  }
+
+  function setComponentReady() {
+    sendToStreamlit("streamlit:componentReady", { apiVersion: 1 });
+  }
+
+  function setComponentValue(value) {
+    window.parent.postMessage(
+      { type: "streamlit:setComponentValue", value, dataType: "json" },
+      "*"
+    );
+  }
+
+  function setFrameHeight() {
+    const h = document.getElementById("container").scrollHeight + 20;
+    window.parent.postMessage({ type: "streamlit:setFrameHeight", height: h }, "*");
+  }
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  let stream      = null;
+  let facingMode  = "environment"; // default = back camera
+  let capturedURL = null;
+
+  const video          = document.getElementById("video");
+  const preview        = document.getElementById("preview");
+  const canvas         = document.getElementById("canvas");
+  const flipBtn        = document.getElementById("flipBtn");
+  const captureBtn     = document.getElementById("captureBtn");
+  const retakeBtn      = document.getElementById("retakeBtn");
+  const useBtn         = document.getElementById("useBtn");
+  const liveControls   = document.getElementById("liveControls");
+  const previewControls= document.getElementById("previewControls");
+  const errorMsg       = document.getElementById("errorMsg");
+
+  // ── Camera helpers ────────────────────────────────────────────────────────
+  async function startCamera(facing) {
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: facing },
+          width:  { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+      video.srcObject = stream;
+      errorMsg.textContent = "";
+    } catch (err) {
+      errorMsg.textContent = "Camera error: " + err.message;
+    }
+  }
+
+  function showLiveView() {
+    preview.style.display        = "none";
+    video.style.display          = "";
+    liveControls.style.display   = "flex";
+    previewControls.style.display= "none";
+    retakeBtn.style.display      = "none";
+    useBtn.style.display         = "none";
+    capturedURL = null;
+    setFrameHeight();
+  }
+
+  function showPreviewView(dataURL) {
+    capturedURL = dataURL;
+    preview.src                  = dataURL;
+    preview.style.display        = "";
+    video.style.display          = "none";
+    liveControls.style.display   = "none";
+    previewControls.style.display= "flex";
+    retakeBtn.style.display      = "inline-block";
+    useBtn.style.display         = "inline-block";
+    setFrameHeight();
+  }
+
+  // ── Button events ─────────────────────────────────────────────────────────
+  flipBtn.addEventListener("click", () => {
+    facingMode = (facingMode === "environment") ? "user" : "environment";
+    startCamera(facingMode);
+  });
+
+  captureBtn.addEventListener("click", () => {
+    if (!stream) return;
+    canvas.width  = video.videoWidth  || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    const dataURL = canvas.toDataURL("image/jpeg", 0.92);
+    showPreviewView(dataURL);
+  });
+
+  retakeBtn.addEventListener("click", () => {
+    setComponentValue(null);
+    showLiveView();
+  });
+
+  useBtn.addEventListener("click", () => {
+    if (capturedURL) {
+      setComponentValue(capturedURL);
+    }
+  });
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  video.addEventListener("loadedmetadata", setFrameHeight);
+
+  setComponentReady();
+  startCamera(facingMode);
+</script>
+</body>
+</html>

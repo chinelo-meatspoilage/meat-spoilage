@@ -22,12 +22,22 @@ Deploy to Streamlit Cloud:
 
 from __future__ import annotations
 
+import base64
+import io
 import os
 import tempfile
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 from PIL import Image
+
+# Register the custom camera component (served from camera_component/index.html).
+# declare_component with a local path works both locally and on Streamlit Cloud.
+_camera_with_flip = components.declare_component(
+    "camera_with_flip",
+    path=str(Path(__file__).parent / "camera_component"),
+)
 
 # ── Page configuration ────────────────────────────────────────────────────────
 
@@ -118,9 +128,15 @@ with tab_upload:
             show_result(probs)
 
 with tab_camera:
-    photo = st.camera_input("Take a photo of the meat")
-    if photo:
-        pil_img = Image.open(photo)
+    st.markdown(
+        "Point the camera at the meat and press **Capture**. "
+        "Use **Flip Camera** to switch between front and back."
+    )
+    data_url = _camera_with_flip(key="camera_flip", default=None)
+    if data_url:
+        # data_url is "data:image/jpeg;base64,<encoded>" — decode to PIL
+        _, encoded = data_url.split(",", 1)
+        pil_img = Image.open(io.BytesIO(base64.b64decode(encoded)))
         col1, col2 = st.columns(2)
         with col1:
             st.image(pil_img, caption="Captured image", use_container_width=True)
